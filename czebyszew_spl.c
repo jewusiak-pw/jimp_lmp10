@@ -41,26 +41,25 @@ typedef struct w {
 void wstaw_w(wielomian_t *w, wielomian_t *nowy) {
 
     for (int i = 0; i < nowy->size; i++) {
-        int dodane=0;
+        int dodane = 0;
         /*
          * Szukamy w *w elementu którego stopień jest taki sam (w->list[i].st) jak w nowym
          * Jeżeli jest to sumujemy w *w współcz.
          * Jeżeli nie to dodajmey nowy element x_t
          */
-        for(int j=0;j<w->size;j++){
-            if (w->list[j].st == nowy->list[i].st)
-            {
+        for (int j = 0; j < w->size; j++) {
+            if (w->list[j].st == nowy->list[i].st) {
                 w->list[j].wsp += nowy->list[i].wsp;
-                dodane=1;
+                dodane = 1;
             }
         }
 
 
-        if(dodane==0){
-            w->list=realloc(w->list,(w->size +1)*sizeof(*w->list));
+        if (dodane == 0) {
+            w->list = realloc(w->list, (w->size + 1) * sizeof(*w->list));
             w->size++;
-            w->list[w->size-1].st=nowy->list[i].st;
-            w->list[w->size-1].wsp=nowy->list[i].wsp;
+            w->list[w->size - 1].st = nowy->list[i].st;
+            w->list[w->size - 1].wsp = nowy->list[i].wsp;
         }
     }
 
@@ -72,26 +71,30 @@ wielomian_t *gen_b(int n) {
     wielomian_t *k = malloc(sizeof *k);
     wielomian_t *km1 = malloc(sizeof *km1);
     wielomian_t *km2 = malloc(sizeof *km2);
-    w->size = km1->size = km2->size= k->size = 0;
-    w->list= malloc(sizeof *w->list);
-    k->list= malloc(sizeof *k->list);
-    km1->list= malloc(sizeof *km1->list);
-    km2->list= malloc(sizeof *km2->list);
-    for (int i = 0; i <= n; i++) {
-        if (i == 0) {
-            km2->list = malloc(sizeof *km2->list);
-            km2->size = 1;
-            km2->list->wsp = 1;
-            km2->list->st = 0;
-            wstaw_w(w, km2);
+    w->size = km1->size = km2->size = k->size = 0;
+    w->list = malloc(sizeof *w->list);
+    k->list = malloc(sizeof *k->list);
+    km1->list = malloc(sizeof *km1->list);
+    km2->list = malloc(sizeof *km2->list);
 
-        } else if (i == 1) {
-            km1->list = malloc(sizeof *km1->list);
-            km1->size = 1;
-            km1->list->wsp = 1;
-            km1->list->st = 1;
-            wstaw_w(w, km1);
-        } else {
+        km2->list = malloc(sizeof *km2->list);
+        km2->size = 1;
+        km2->list->wsp = 1;
+        km2->list->st = 0;
+
+
+
+    km1->list = malloc(sizeof *km1->list);
+    km1->size = 1;
+    km1->list->wsp = 1;
+    km1->list->st = 1;
+
+    if(n==0)
+        return km2;
+    if(n==1)
+        return km1;
+    for (int i = 2; i <= n; i++) {
+
             for (int j = 0; j < km1->size; j++) {
                 km1->list[j].st++;
                 km1->list[j].wsp *= 2.;
@@ -100,8 +103,8 @@ wielomian_t *gen_b(int n) {
                 km2->list[j].wsp *= -1.;
             }
             wstaw_w(k, km1);
-            wstaw_w(k,km2);
-            wstaw_w(w,k);
+            wstaw_w(k, km2);
+            wstaw_w(w, k);
             for (int j = 0; j < km1->size; j++) {
                 km1->list[j].st--;
                 km1->list[j].wsp /= 2.;
@@ -109,93 +112,96 @@ wielomian_t *gen_b(int n) {
             for (int j = 0; j < km2->size; j++) {
                 km2->list[j].wsp *= -1.;
             }
-            km2=km1;
-            km1=k;
-            k=malloc(sizeof *k);
-            k->list= malloc(sizeof *k->list);
-            k->size=0;
-        }
+            km2 = km1;
+            km1 = k;
+            k = malloc(sizeof *k);
+            k->list = malloc(sizeof *k->list);
+            k->size = 0;
+
     }
     return w;
 }
 
-wielomian_t *gen_b(int n) {
+
+wielomian_t *czeb(int n, double *wsp) {
     wielomian_t *w = malloc(sizeof *w);
-    wielomian_t *k = malloc(sizeof *k);
-    wielomian_t *km1 = malloc(sizeof *km1);
-    wielomian_t *km2 = malloc(sizeof *km2);
-    w->size = km1->size = km2->size= k->size = 0;
-    w->list= malloc(sizeof *w->list);
-    k->list= malloc(sizeof *k->list);
-    km1->list= malloc(sizeof *km1->list);
-    km2->list= malloc(sizeof *km2->list);
-    for (int i = 0; i <= n; i++) {
-        if (i == 0) {
-            km2->list = malloc(sizeof *km2->list);
-            km2->size = 1;
-            km2->list->wsp = 1;
-            km2->list->st = 0;
-            wstaw_w(w, km2);
+    wielomian_t *nowy;
 
-        } else if (i == 1) {
-            km1->list = malloc(sizeof *km1->list);
-            km1->size = 1;
-            km1->list->wsp = 1;
-            km1->list->st = 1;
-            wstaw_w(w, km1);
-        } else {
-            for (int j = 0; j < km1->size; j++) {
-                km1->list[j].st++;
-                km1->list[j].wsp *= 2.;
-            }
-            for (int j = 0; j < km2->size; j++) {
-                km2->list[j].wsp *= -1.;
-            }
-            wstaw_w(k, km1);
-            wstaw_w(k,km2);
-            wstaw_w(w,k);
-            for (int j = 0; j < km1->size; j++) {
-                km1->list[j].st--;
-                km1->list[j].wsp /= 2.;
-            }
-            for (int j = 0; j < km2->size; j++) {
-                km2->list[j].wsp *= -1.;
-            }
-            km2=km1;
-            km1=k;
-            k=malloc(sizeof *k);
-            k->list= malloc(sizeof *k->list);
-            k->size=0;
+    w->size = 0;
+    w->list = malloc(sizeof *w->list);
+
+    for (int i = 0; i < n; i++) {
+        nowy = gen_b(i);
+        for (int j = 0; j < nowy->size; j++) {
+            nowy->list[j].wsp *= wsp[i];
         }
+        wstaw_w(w, nowy);
+
     }
+
     return w;
 }
 
+
+wielomian_t *calc_dx(wielomian_t *w) {
+    wielomian_t *nowy = malloc(sizeof *nowy);
+    int n = w->size;
+    nowy->size = w->size;
+    nowy->list = malloc(nowy->size * sizeof *nowy->list);
+    for (int i = 0; i < n; i++) {
+
+        if (w->list[i].st == 0) {
+
+            nowy->list[i].wsp = 0;
+            nowy->list[i].st = 0;
+        } else {
+            nowy->list[i].wsp = (w->list[i].st) * (w->list[i].wsp);
+            nowy->list[i].st = w->list[i].st - 1;
+
+        }
+
+    }
+    return nowy;
+
+}
+
+
+double wylicz(wielomian_t *w, double x) {
+    double wynik = 0;
+    for (int i = 0; i < w->size; i++) {
+        wynik += pow(x, w->list[i].st) * (w->list[i].wsp);
+    }
+    return wynik;
+
+}
+
+double mapt(double a, double b, double x){ //t(x)
+    return ((a+b)/2)+(((b-a)/2)*x);
+}
+
+double mapx(double a, double b, double t){ //x(t)
+    return (2/(b-a))*t-((a+b)/(b-a));
+}
 
 
 void make_spl(points_t *pts, spline_t *spl) {
 
 
-
-
-
-
     if (pts->n == 0)
         exit(50);
 
-    double max_x = *pts->x, min_x = *pts->x;
+    double a = *pts->x, b = *pts->x;
 
 
     for (int i = 1; i < pts->n; i++) {
-        if (pts->x[i] < min_x)
-            min_x = pts->x[i];
-        if (pts->x[i] > max_x)
-            max_x = pts->x[i];
+        if (pts->x[i] < b)
+            b = pts->x[i];
+        if (pts->x[i] > a)
+            a = pts->x[i];
 
     }
-//x*=s+tx
-    double t = 2 / (max_x - min_x);
-    double s = -(min_x + max_x) / (max_x - min_x);
+double t=mapx(a,b,a);
+    double d=mapx(a,b,b);
 
 /*
  * Do zapisu:
@@ -209,52 +215,44 @@ void make_spl(points_t *pts, spline_t *spl) {
     for (int i = 0; i < pts->n; i++) {//rzad
         int j;
         for (j = 0; j < pts->n; j++) {//kol
-            add_to_entry_matrix(mat, i, j, gen_baz(s + t * pts->x[i], j));
+            wielomian_t *gb=gen_b(j);
+            double val=wylicz(gb,pts->x[i]);
+            add_to_entry_matrix(mat, i, j, val );
         }
         add_to_entry_matrix(mat, i, j, pts->y[i]);
     }
-    //write_matrix(mat, stdout);
+    write_matrix(mat, stdout);
     if (piv_ge_solver(mat)) {
         spl->n = 0;
         return;
     }
-    //write_matrix(mat, stdout);
+    write_matrix(mat, stdout);
 
     double *wsp = malloc(pts->n * sizeof *wsp);
     for (int i = 0; i < pts->n; i++)
         wsp[i] = get_entry_matrix(mat, i, pts->n);
 
 
+    wielomian_t *interpol = czeb(pts->n, wsp);
+wielomian_t *dint= calc_dx(interpol);
+wielomian_t *ddint= calc_dx(dint);
+wielomian_t *dddint= calc_dx(ddint);
+    //będzie trzeba elementy skalować ponownie
+
     alloc_spl(spl, pts->n);
     spl->n = pts->n;
     int i;
-    puts("Churski\t|\tNasze");
-    for (i = 0; i < pts->n - 1; i++) {
-        //printf("%g\t|\t%g\n", fi(pts->n, s + t * pts->x[i]), getf(wsp, s + t * pts->x[i], pts->n));
-
-
+    for (i = 0; i < pts->n; i++) {
         double w = get_entry_matrix(mat, i, pts->n);
         spl->x[i] = pts->x[i];
-        spl->f[i] = gen_baz(s + t * pts->x[i], pts->n);
-        //spl->f1[i] = w*dfi(pts->n,s+t*pts->x[i]);
-        //spl->f2[i] = w*d2fi(pts->n,s+t*pts->x[i]);
-        //spl->f3[i] = w*d3fi(pts->n,s+t*pts->x[i]);
+        spl->f[i] = pts->y[i];
+        spl->f1[i] =wylicz(dint,pts->x[i]);
+        spl->f2[i] =wylicz(ddint,pts->x[i]);
+        spl->f3[i] = wylicz(dddint,pts->x[i]);
 
 
     }
-    spl->x[i] = pts->x[i];
-    spl->f[i] = getf(wsp, s + t * pts->x[i], pts->n);
-    spl->f1[i] = spl->f1[i - 1];
-    spl->f2[i] = spl->f2[i - 1];
-    spl->f3[i] = spl->f3[i - 1];
 
-
-    printf("----\n");
-    FILE *oo = fopen("out.tt", "w");
-    for (double dt = 5.03; dt < 5.96; dt += 0.01) {
-
-        fprintf(oo, "%g %g\n", dt, getf(wsp, s + t * dt, pts->n));
-    }
 
 
 }
