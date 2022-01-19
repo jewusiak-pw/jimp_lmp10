@@ -3,29 +3,9 @@
 #include "makespl.h"
 #include "piv_ge_solver.h"
 
-double gen_baz(double x, int deg) {
-    double km1, k, kp1;
-    if (deg == 0)
-        return 1;
-    if (deg == 1)
-        return x;
-    k = x;
-    km1 = 1;
-    for (int i = 2; i <= deg; i++) {
-        kp1 = 2 * x * k - km1;
-        km1 = k;
-        k = kp1;
-    }
-    return kp1;
-}
 
 
-double getf(double *wsp, double x, int n) {
-    double sum = 0;
-    for (int i = 0; i < n; i++)
-        sum += gen_baz(x, i) * wsp[i];
-    return sum;
-}
+
 
 typedef struct x {
     double wsp;
@@ -200,8 +180,6 @@ void make_spl(points_t *pts, spline_t *spl) {
             a = pts->x[i];
 
     }
-double t=mapx(a,b,a);
-    double d=mapx(a,b,b);
 
 /*
  * Do zapisu:
@@ -211,12 +189,14 @@ double t=mapx(a,b,a);
  */
 
 
+
+
     matrix_t *mat = make_matrix(pts->n, pts->n + 1);
     for (int i = 0; i < pts->n; i++) {//rzad
         int j;
         for (j = 0; j < pts->n; j++) {//kol
             wielomian_t *gb=gen_b(j);
-            double val=wylicz(gb,pts->x[i]);
+            double val=wylicz(gb,mapx(a,b,pts->x[i]));
             add_to_entry_matrix(mat, i, j, val );
         }
         add_to_entry_matrix(mat, i, j, pts->y[i]);
@@ -228,7 +208,7 @@ double t=mapx(a,b,a);
     }
     write_matrix(mat, stdout);
 
-    double *wsp = malloc(pts->n * sizeof *wsp);
+     double *wsp = malloc(pts->n * sizeof *wsp);
     for (int i = 0; i < pts->n; i++)
         wsp[i] = get_entry_matrix(mat, i, pts->n);
 
@@ -245,10 +225,10 @@ wielomian_t *dddint= calc_dx(ddint);
     for (i = 0; i < pts->n; i++) {
         double w = get_entry_matrix(mat, i, pts->n);
         spl->x[i] = pts->x[i];
-        spl->f[i] = pts->y[i];
-        spl->f1[i] =wylicz(dint,pts->x[i]);
-        spl->f2[i] =wylicz(ddint,pts->x[i]);
-        spl->f3[i] = wylicz(dddint,pts->x[i]);
+        spl->f[i] = wylicz(interpol,mapx(a,b,pts->x[i]));
+        spl->f1[i] =wylicz(dint,mapx(a,b,pts->x[i]));
+        spl->f2[i] =wylicz(ddint,mapx(a,b,pts->x[i]));
+        spl->f3[i] = wylicz(dddint,mapx(a,b,pts->x[i]));
 
 
     }
