@@ -13,6 +13,9 @@ prosta: main.o splines.o points.o prosta.o
 czebyszew: main.o splines.o points.o czebyszew_spl.o gaus/libge.a
 	$(CC) -ggdb -o czebyszew  main.o splines.o points.o czebyszew_spl.o -L gaus -l ge
 
+czebysz: main.o splines.o points.o czebysz.o gaus/libge.a
+	$(CC) -ggdb -o czebysz  main.o splines.o points.o czebysz.o -L gaus -l ge
+
 aproksymator_na_bazie.o: makespl.h points.h gaus/piv_ge_solver.h
 	$(CC) -ggdb -I gaus -c aproksymator_na_bazie.c
 
@@ -21,6 +24,9 @@ interpolator.o: makespl.h points.h gaus/piv_ge_solver.h
 
 czebyszew_spl.o: makespl.h points.h gaus/piv_ge_solver.h
 	$(CC) -ggdb -I gaus -c czebyszew_spl.c
+
+czebysz.o: makespl.h points.h gaus/piv_ge_solver.h
+	$(CC) -ggdb -I gaus -c czebysz.c
 
 .PHONY: clean
 
