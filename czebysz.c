@@ -219,7 +219,7 @@ make_spl(points_t *pts, spline_t *spl) {
     double a = x[0];
     double b = x[pts->n - 1];
     int i, j, k;
-    int nb = pts->n - 3 > 10 ? 10 : pts->n - 3;
+    int nb = pts->n;//pts->n - 3 > 10 ? 10 : pts->n - 3;
     char *nbEnv = getenv("APPROX_BASE_SIZE");
 
     if (nbEnv != NULL && atoi(nbEnv) > 0)
