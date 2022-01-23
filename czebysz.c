@@ -219,7 +219,7 @@ make_spl(points_t *pts, spline_t *spl) {
     double a = x[0];
     double b = x[pts->n - 1];
     int i, j, k;
-    int nb = pts->n - 3 > 10 ? 10 : pts->n - 3;
+    int nb = pts->n -3 > 10 ? 10: pts->n -3;
     char *nbEnv = getenv("APPROX_BASE_SIZE");
 
     if (nbEnv != NULL && atoi(nbEnv) > 0)
@@ -227,47 +227,22 @@ make_spl(points_t *pts, spline_t *spl) {
 
     eqs = make_matrix(nb, nb + 1);
 
-#ifdef DEBUG
-#define TESTBASE 500
-    {
-        FILE           *tst = fopen("debug_base_plot.txt", "w");
-        double		dx = (b - a) / (TESTBASE - 1);
-        for( j= 0; j < nb; j++ )
-            xfi( a, b, nb, j, tst );
-        for (i = 0; i < TESTBASE; i++) {
-            fprintf(tst, "%g", a + i * dx);
-            for (j = 0; j < nb; j++) {
-                fprintf(tst, " %g", fi  (a, b, nb, j, a + i * dx));
-                fprintf(tst, " %g", dfi (a, b, nb, j, a + i * dx));
-                fprintf(tst, " %g", d2fi(a, b, nb, j, a + i * dx));
-                fprintf(tst, " %g", d3fi(a, b, nb, j, a + i * dx));
-            }
-            fprintf(tst, "\n");
-        }
-        fclose(tst);
-    }
-#endif
+
 
     for (j = 0; j < nb; j++) {
         for (i = 0; i < nb; i++)
             for (k = 0; k < pts->n; k++)
-                add_to_entry_matrix(eqs, j, i, wylicz(gen_b(i), mapx(a, b, x[k])) * wylicz(gen_b(j), mapx(a, b, x[k])));
+                add_to_entry_matrix(eqs, j, i, wylicz(gen_b(i),  x[k]) * wylicz(gen_b(j),  x[k]));
 
         for (k = 0; k < pts->n; k++)
-            add_to_entry_matrix(eqs, j, nb, y[k] * wylicz(gen_b(j), mapx(a,b,x[k])));
+            add_to_entry_matrix(eqs, j, nb, y[k] * wylicz(gen_b(j), x[k]));
     }
 
-#ifdef DEBUG
-    write_matrix(eqs, stdout);
-#endif
 
     if (piv_ge_solver(eqs)) {
         spl->n = 0;
         return;
     }
-#ifdef DEBUG
-    write_matrix(eqs, stdout);
-#endif
 
     if (alloc_spl(spl, nb) == 0) {
         for (i = 0; i < spl->n; i++) {
@@ -280,7 +255,6 @@ make_spl(points_t *pts, spline_t *spl) {
             for (k = 0; k < nb; k++) {
                 double ck = get_entry_matrix(eqs, k, nb);
                 wielomian_t *bz = gen_b(k);
-                xx=mapx(a,b,xx);
                 spl->f[i] += ck * fi(bz, xx);
                 spl->f1[i] += ck * dfi(bz, xx);
                 spl->f2[i] += ck * d2fi(bz, xx);
@@ -289,26 +263,6 @@ make_spl(points_t *pts, spline_t *spl) {
         }
     }
 
-#ifdef DEBUG
-    {
-        FILE           *tst = fopen("debug_spline_plot.txt", "w");
-        double		dx = (b - a) / (TESTBASE - 1);
-        for (i = 0; i < TESTBASE; i++) {
-            double yi= 0;
-            double dyi= 0;
-            double d2yi= 0;
-            double d3yi= 0;
-            double xi= a + i * dx;
-            for( k= 0; k < nb; k++ ) {
-                            yi += get_entry_matrix(eqs, k, nb) * fi(a, b, nb, k, xi);
-                            dyi += get_entry_matrix(eqs, k, nb) * dfi(a, b, nb, k, xi);
-                            d2yi += get_entry_matrix(eqs, k, nb) * d2fi(a, b, nb, k, xi);
-                            d3yi += get_entry_matrix(eqs, k, nb) * d3fi(a, b, nb, k, xi);
-            }
-            fprintf(tst, "%g %g %g %g %g\n", xi, yi, dyi, d2yi, d3yi );
-        }
-        fclose(tst);
-    }
-#endif
+
 
 }
