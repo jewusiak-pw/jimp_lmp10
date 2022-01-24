@@ -185,26 +185,7 @@ d3fi(wielomian_t *w, double x) {
     return wylicz(calc_dx(calc_dx(calc_dx(w))), x);
 }
 
-/* Pomocnicza f. do rysowania bazy */
-double
-xfi(double a, double b, int n, int i, FILE *out) {
-    double h = (b - a) / (n - 1);
-    double h3 = h * h * h;
-    int hi[5] = {i - 2, i - 1, i, i + 1, i + 2};
-    double hx[5];
-    int j;
 
-    for (j = 0; j < 5; j++)
-        hx[j] = a + h * hi[j];
-
-    fprintf(out, "# nb=%d, i=%d: hi=[", n, i);
-    for (j = 0; j < 5; j++)
-        fprintf(out, " %d", hi[j]);
-    fprintf(out, "] hx=[");
-    for (j = 0; j < 5; j++)
-        fprintf(out, " %g", hx[j]);
-    fprintf(out, "]\n");
-}
 
 double mapx(double a, double b, double t) { //x(t)
     return (2 / (b - a)) * t - ((a + b) / (b - a));
@@ -219,7 +200,7 @@ make_spl(points_t *pts, spline_t *spl) {
     double a = x[0];
     double b = x[pts->n - 1];
     int i, j, k;
-    int nb = pts->n -3 > 10 ? 10: pts->n -3;
+    int nb = pts->n;
     char *nbEnv = getenv("APPROX_BASE_SIZE");
 
     if (nbEnv != NULL && atoi(nbEnv) > 0)
