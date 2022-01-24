@@ -10,9 +10,6 @@ intrp: main.o splines.o points.o interpolator.o gaus/libge.a
 prosta: main.o splines.o points.o prosta.o
 	$(CC) -ggdb  -o prosta  main.o splines.o points.o prosta.o
 
-czebyszew: main.o splines.o points.o czebyszew_spl.o gaus/libge.a
-	$(CC) -ggdb -o czebyszew  main.o splines.o points.o czebyszew_spl.o -L gaus -l ge
-
 czebysz: main.o splines.o points.o czebysz.o gaus/libge.a
 	$(CC) -ggdb -o czebysz  main.o splines.o points.o czebysz.o -L gaus -l ge
 
@@ -27,7 +24,6 @@ czebysz.o: makespl.h points.h gaus/piv_ge_solver.h
 
 .PHONY: clean
 
-c-clean: clean
 
 clean:
 	-rm *.o aprox intrp prosta czebysz main

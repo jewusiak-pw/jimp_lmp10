@@ -97,6 +97,12 @@ wielomian_t *gen_b(int n) {
         k->size = 0;
 
     }
+    free(k->list);
+    free(km1->list);
+    free(km2->list);
+    free(k);
+    free(km2);
+    free(km1);
     return w;
 }
 
@@ -116,7 +122,8 @@ wielomian_t *czeb(int n, double *wsp) {
         wstaw_w(w, nowy);
 
     }
-
+    free(nowy->list);
+    free(nowy);
     return w;
 }
 
@@ -186,7 +193,6 @@ d3fi(wielomian_t *w, double x) {
 }
 
 
-
 double mapx(double a, double b, double t) { //x(t)
     return (2 / (b - a)) * t - ((a + b) / (b - a));
 }
@@ -200,7 +206,7 @@ make_spl(points_t *pts, spline_t *spl) {
     double a = x[0];
     double b = x[pts->n - 1];
     int i, j, k;
-    int nb = pts->n;
+    int nb = pts->n > 20 ? 20 : pts->n;
     char *nbEnv = getenv("APPROX_BASE_SIZE");
 
     if (nbEnv != NULL && atoi(nbEnv) > 0)
@@ -209,11 +215,10 @@ make_spl(points_t *pts, spline_t *spl) {
     eqs = make_matrix(nb, nb + 1);
 
 
-
     for (j = 0; j < nb; j++) {
         for (i = 0; i < nb; i++)
             for (k = 0; k < pts->n; k++)
-                add_to_entry_matrix(eqs, j, i, wylicz(gen_b(i),  x[k]) * wylicz(gen_b(j),  x[k]));
+                add_to_entry_matrix(eqs, j, i, wylicz(gen_b(i), x[k]) * wylicz(gen_b(j), x[k]));
 
         for (k = 0; k < pts->n; k++)
             add_to_entry_matrix(eqs, j, nb, y[k] * wylicz(gen_b(j), x[k]));
@@ -243,7 +248,6 @@ make_spl(points_t *pts, spline_t *spl) {
             }
         }
     }
-
 
 
 }
